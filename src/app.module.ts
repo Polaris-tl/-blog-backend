@@ -1,11 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { LoginGuard } from '@/common/gurad/login';
+import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    PostModule,
+    JwtModule.register({
+      global: true,
+      secret: 'SECRET_KEY',
+      signOptions: {
+        expiresIn: '1d',
+      },
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -13,12 +22,19 @@ import { UserModule } from './user/user.module';
       username: 'root',
       password: '1234qwer',
       database: 'blog',
-      entities: [],
+      entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true, // 生产环境请关闭此选项
     }),
+    AuthModule,
+    PostModule,
     UserModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: LoginGuard,
+    },
+  ],
 })
 export class AppModule {}
