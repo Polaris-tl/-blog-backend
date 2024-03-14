@@ -6,15 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { SkipLoginCheckKey } from '@/common/decorator/login';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class LoginGuard implements CanActivate {
-  @Inject(JwtService)
-  private jwtService: JwtService;
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -31,7 +34,7 @@ export class LoginGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: 'SECRET_KEY',
+        secret: this.configService.get('jwt.secret'),
       });
       request.user = payload;
     } catch {

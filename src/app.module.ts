@@ -2,28 +2,40 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginGuard } from '@/common/gurad/login';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from '@/config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    JwtModule.register({
-      global: true,
-      secret: 'SECRET_KEY',
-      signOptions: {
-        expiresIn: '1d',
-      },
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '1234qwer',
-      database: 'blog',
-      entities: ['dist/**/*.entity{.ts,.js}'],
-      synchronize: true, // 生产环境请关闭此选项
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      global: true,
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('jwt.secretKey'),
+        signOptions: {
+          expiresIn: configService.get('jwt.expiresIn'),
+        },
+      }),
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('database.host'),
+        port: configService.get('database.port'),
+        username: configService.get('database.username'),
+        password: configService.get('database.password'),
+        database: configService.get('database.database'),
+        entities: ['dist/**/*.entity{.ts,.js}'],
+        synchronize: true,
+      }),
     }),
     AuthModule,
     PostModule,
