@@ -10,9 +10,25 @@ export class UserEntity {
   @Column({ length: 100, nullable: false })
   password: string;
 
+  @Column({ length: 100, nullable: true })
+  email: string;
+
+  @Column({ length: 100, nullable: true })
+  avatar: string;
+
+  @Column({
+    length: 100,
+    nullable: true,
+    comment: '用户角色 0-普通用户 1-管理员',
+  })
+  role: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   create_time: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   update_time: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
 }
