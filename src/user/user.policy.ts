@@ -13,15 +13,18 @@ export class UserGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const method = context.getHandler().name;
     const request = context.switchToHttp().getRequest();
+    if (request.user.role === '1') return true;
 
     if (!this[method]) return true;
     return await this[method](request);
   }
 
+  async update(request) {
+    const { user, params } = request;
+    return user.id === params.id;
+  }
   async create(request) {
     const { user } = request;
-    console.log(user);
-
     return user.role === '1';
   }
 
