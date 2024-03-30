@@ -21,10 +21,17 @@ export class UserService {
 
   async findOne(username: string) {
     return await this.userRepository.findOne({
-      where: { username },
+      where: { username, deleted_at: null },
       select: ['id', 'username', 'password', 'email', 'avatar'],
     });
   }
+  async findById(id: string) {
+    return await this.userRepository.findOne({
+      where: { id: +id, deleted_at: null },
+      select: ['id', 'username', 'password', 'email', 'avatar'],
+    });
+  }
+
   async update(id: number, updateUserDto: CreateUserDto) {
     await this.userRepository.update(
       { id },

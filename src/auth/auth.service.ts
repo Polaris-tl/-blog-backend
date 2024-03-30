@@ -22,7 +22,16 @@ export class AuthService {
     const access_token = this.jwtService.sign(payload);
 
     return {
-      access_token,
+      token: access_token,
+      user: payload,
     };
+  }
+
+  async getUserInfo(id: string) {
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw '用户不存在';
+    }
+    return user;
   }
 }

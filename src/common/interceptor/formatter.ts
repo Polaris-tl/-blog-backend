@@ -31,7 +31,7 @@ function transformObjectDeep(obj: any) {
 }
 
 export interface Response<T> {
-  data: T;
+  result: T;
 }
 
 @Injectable()
@@ -47,7 +47,7 @@ export class FormatterInterceptor<T>
         return {
           code: 200,
           success: true,
-          data: transformObjectDeep(data),
+          result: transformObjectDeep(data),
           msg: '请求成功',
         };
       }),
