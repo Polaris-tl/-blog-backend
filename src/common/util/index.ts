@@ -1,8 +1,8 @@
 export function pickFields<T extends Record<string, any> = any>(
   user: T,
-  fields: string[],
+  fields: Array<keyof T>,
 ): Partial<T> {
-  const result = {};
+  const result: Partial<T> = {};
   fields.forEach((field) => {
     result[field] = user[field];
   });

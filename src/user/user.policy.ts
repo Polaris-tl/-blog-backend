@@ -13,6 +13,7 @@ export class UserGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const method = context.getHandler().name;
     const request = context.switchToHttp().getRequest();
+    // 管理员放行所有操作
     if (request.user.role === '1') return true;
 
     if (!this[method]) return true;
@@ -23,16 +24,7 @@ export class UserGuard implements CanActivate {
     const { user, params } = request;
     return user.id === params.id;
   }
-  async create(request) {
-    const { user } = request;
-    return user.role === '1';
-  }
-
-  async findOne(request) {
-    const { user, params } = request;
-    const res = await this.userRepository.findOne({
-      where: { username: params.username },
-    });
-    return res.id === user.id;
+  async remove() {
+    return false;
   }
 }

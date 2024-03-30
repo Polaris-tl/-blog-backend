@@ -7,6 +7,9 @@ import configuration from '@/config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
+import { TagModule } from './tag/tag.module';
+import { CategoryModule } from './category/category.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -40,6 +43,9 @@ import { UserModule } from './user/user.module';
     AuthModule,
     PostModule,
     UserModule,
+    TagModule,
+    CategoryModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [

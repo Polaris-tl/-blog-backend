@@ -14,12 +14,15 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.userRepository.save(createUserDto);
+    return await this.userRepository.save(
+      pickFields(createUserDto, ['username', 'password', 'email', 'avatar']),
+    );
   }
 
   async findOne(username: string) {
     return await this.userRepository.findOne({
       where: { username },
+      select: ['id', 'username', 'password', 'email', 'avatar'],
     });
   }
   async update(id: number, updateUserDto: CreateUserDto) {

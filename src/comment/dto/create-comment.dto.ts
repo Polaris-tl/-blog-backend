@@ -1,16 +1,15 @@
 import { IsString, IsOptional } from 'class-validator';
-export class CreatePostDto {
+export class CreateCommentDto {
   @IsString()
-  title: string;
+  name: string;
+
+  @IsString()
+  post_id: string;
+
+  @IsString()
+  @IsOptional()
+  p_id: string;
 
   @IsString()
   content: string;
-
-  @IsString()
-  @IsOptional()
-  cover: string;
-
-  @IsString()
-  @IsOptional()
-  publish: boolean;
 }
