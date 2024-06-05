@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { TagGuard } from './tag.policy';
@@ -23,8 +24,8 @@ export class TagController {
   }
 
   @Get()
-  findAll() {
-    return this.tagService.findAll();
+  findAll(@Query('page') page: string, @Query('pageSize') pageSize: string) {
+    return this.tagService.findAll(+(page || 1), +(pageSize || 10));
   }
 
   @Get(':id')

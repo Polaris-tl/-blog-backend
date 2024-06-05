@@ -22,7 +22,7 @@ export class UserService {
   async findOne(username: string) {
     return await this.userRepository.findOne({
       where: { username, deleted_at: null },
-      select: ['id', 'username', 'password', 'email', 'avatar'],
+      select: ['id', 'username', 'password', 'email', 'avatar', 'role'],
     });
   }
   async findById(id: string) {
