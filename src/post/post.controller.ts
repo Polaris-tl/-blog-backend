@@ -11,6 +11,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '@/common/decorator/user';
+import { SkipLoginCheck } from '@/common/decorator/login';
 
 @Controller('post')
 export class PostController {
@@ -21,18 +22,20 @@ export class PostController {
     return this.postService.create(createPostDto, user.id);
   }
 
+  @SkipLoginCheck()
   @Get('list')
   findAll(
     @Query('page') page: string,
     @Query('pageSize') pageSize: string,
     @User() user: IUser,
   ) {
-    return this.postService.findAll(user.id, +page, +pageSize);
+    return this.postService.findAll(user?.id, +page, +pageSize);
   }
 
+  @SkipLoginCheck()
   @Get(':id')
   findOne(@Param('id') id: string, @User() user: IUser) {
-    return this.postService.findOne(+id, user.id);
+    return this.postService.findOne(+id, user?.id);
   }
 
   @Post('update/:id')
