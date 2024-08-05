@@ -48,6 +48,25 @@ export class PostController {
     return this.postService.publish(+id, publish);
   }
 
+  @Post('like/:id')
+  like(
+    @Param('id') id: string,
+    @Body('like') like: boolean,
+    @User() user: IUser,
+  ) {
+    console.log(like, 'asdasd');
+    return this.postService.like(id, like, user.id);
+  }
+
+  @Post('collect/:id')
+  collect(
+    @Param('id') id: string,
+    @Body('collect') collect: boolean,
+    @User() user: IUser,
+  ) {
+    return this.postService.collect(id, collect, user.id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postService.remove(+id);

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-@Entity('post_like')
-export class PostLikeEntity {
+@Entity('post_collect')
+export class PostCollectEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

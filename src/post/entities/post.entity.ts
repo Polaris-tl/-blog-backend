@@ -16,6 +16,9 @@ export class PostEntity {
   @Column({ length: 200, nullable: true })
   cover: string;
 
+  @Column({ type: 'boolean', nullable: true, default: false })
+  is_top: boolean;
+
   @Column({ type: 'boolean', nullable: true, default: true })
   publish: boolean;
 

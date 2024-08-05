@@ -24,11 +24,12 @@ export class LoginGuard implements CanActivate {
       SkipLoginCheckKey,
       [context.getHandler(), context.getClass()],
     );
-    if (skipLoginCheck) {
-      return true;
-    }
+
     const token = this.extractTokenFromHeader(request);
     if (!token) {
+      if (skipLoginCheck) {
+        return true;
+      }
       throw new UnauthorizedException();
     }
     try {

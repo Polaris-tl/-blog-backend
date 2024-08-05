@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
+import { PostLikeEntity } from './entities/post-like.entity';
+import { PostCollectEntity } from './entities/post-collect.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { pickFields } from '@/common/util';
@@ -11,6 +13,10 @@ export class PostService {
   constructor(
     @InjectRepository(PostEntity)
     private readonly postRepository: Repository<PostEntity>,
+    @InjectRepository(PostLikeEntity)
+    private readonly postLikeRepository: Repository<PostLikeEntity>,
+    @InjectRepository(PostCollectEntity)
+    private readonly postCollectRepository: Repository<PostCollectEntity>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
   async create(createPostDto: CreatePostDto, userId: string) {
@@ -26,14 +32,17 @@ export class PostService {
         SELECT DISTINCT
             post.*,
             (SELECT COUNT(*) FROM post_like WHERE post_id = post.id) as like_count,
+            (SELECT COUNT(*) FROM post_collect WHERE post_id = post.id) as collect_count,
             (SELECT COUNT(*) FROM comment WHERE post_id = post.id) as comment_count,
-            user_favorite.user_id IS NOT NULL as is_favorite,
+            IF(COUNT(post_like.user_id) > 0, TRUE, FALSE) as is_like,
+            IF(COUNT(post_collect.user_id) > 0, TRUE, FALSE) as is_collect,
             GROUP_CONCAT(DISTINCT tag.name) as tag_names_str,
             GROUP_CONCAT(DISTINCT tag.id) as tag_ids_str,
             GROUP_CONCAT(DISTINCT category.name) as category_names_str,
             GROUP_CONCAT(DISTINCT category.id) as category_ids_str
         FROM post
-        LEFT JOIN user_favorite ON post.id = user_favorite.post_id AND user_favorite.user_id = ?
+        LEFT JOIN post_like ON post.id = post_like.post_id AND post_like.user_id = ?
+        LEFT JOIN post_collect ON post.id = post_collect.post_id AND post_collect.user_id = ?
         LEFT JOIN post_tag ON post.id = post_tag.post_id
         LEFT JOIN tag ON post_tag.tag_id = tag.id
         LEFT JOIN post_category ON post.id = post_category.post_id
@@ -53,6 +62,7 @@ export class PostService {
 
     const offset = (page - 1) * pageSize;
     const mainRes = await this.dataSource.query(mainQuery, [
+      userId,
       userId,
       pageSize,
       offset,
@@ -86,8 +96,10 @@ export class PostService {
       delete item.category_names_str;
       delete item.category_ids_str;
       item.like_count = +item.like_count;
+      item.collect_count = +item.collect_count;
       item.comment_count = +item.comment_count;
-      item.is_favorite = item.is_favorite === 1;
+      item.is_like = item.is_like === '1';
+      item.is_collect = item.is_collect === '1';
     });
 
     return {
@@ -155,14 +167,17 @@ export class PostService {
         SELECT DISTINCT
             post.*,
             (SELECT COUNT(*) FROM post_like WHERE post_id = post.id) as like_count,
+            (SELECT COUNT(*) FROM post_collect WHERE post_id = post.id) as collect_count,
             (SELECT COUNT(*) FROM comment WHERE post_id = post.id) as comment_count,
-            user_favorite.user_id IS NOT NULL as is_favorite,
+            IF(COUNT(post_like.user_id) > 0, TRUE, FALSE) as is_like,
+            IF(COUNT(post_collect.user_id) > 0, TRUE, FALSE) as is_collect,
             GROUP_CONCAT(DISTINCT tag.name) as tag_names_str,
             GROUP_CONCAT(DISTINCT tag.id) as tag_ids_str,
             GROUP_CONCAT(DISTINCT category.name) as category_names_str,
             GROUP_CONCAT(DISTINCT category.id) as category_ids_str
         FROM post
-        LEFT JOIN user_favorite ON post.id = user_favorite.post_id AND user_favorite.user_id = ?
+        LEFT JOIN post_like ON post.id = post_like.post_id AND post_like.user_id = ?
+        LEFT JOIN post_collect ON post.id = post_collect.post_id AND post_collect.user_id = ?
         LEFT JOIN post_tag ON post.id = post_tag.post_id
         LEFT JOIN tag ON post_tag.tag_id = tag.id
         LEFT JOIN post_category ON post.id = post_category.post_id
@@ -173,7 +188,11 @@ export class PostService {
         LIMIT 1
     `;
 
-    const mainRes = await this.dataSource.query(mainQuery, [userId, postId]);
+    const mainRes = await this.dataSource.query(mainQuery, [
+      userId,
+      userId,
+      postId,
+    ]);
 
     mainRes.forEach((item) => {
       const {
@@ -203,8 +222,10 @@ export class PostService {
       delete item.category_names_str;
       delete item.category_ids_str;
       item.like_count = +item.like_count;
+      item.collect_count = +item.collect_count;
       item.comment_count = +item.comment_count;
-      item.is_favorite = item.is_favorite === 1;
+      item.is_like = item.is_like === '1';
+      item.is_collect = item.is_collect === '1';
     });
 
     return mainRes[0] || null;
@@ -221,13 +242,47 @@ export class PostService {
   }
 
   publish(id: number, publish = true) {
-    return this.postRepository.update(
-      { id },
-      { publish, update_time: new Date() },
-    );
+    this.postRepository.update({ id }, { publish, update_time: new Date() });
+  }
+
+  async like(id: string, like = true, userId) {
+    const res = await this.postLikeRepository.findOne({
+      where: { post_id: +id, user_id: userId },
+    });
+    if (res) {
+      !like &&
+        this.postLikeRepository.delete({ user_id: +userId, post_id: +id });
+    } else {
+      like &&
+        this.postLikeRepository.save({
+          post_id: +id,
+          user_id: userId,
+          like,
+        });
+    }
+  }
+
+  async collect(id: string, favorite = true, userId) {
+    const res = await this.postCollectRepository.findOne({
+      where: { post_id: +id, user_id: userId },
+    });
+    if (res) {
+      !favorite &&
+        this.postCollectRepository.delete({
+          user_id: +userId,
+          post_id: +id,
+        });
+    } else {
+      favorite &&
+        this.postCollectRepository.save({
+          post_id: +id,
+          user_id: userId,
+          favorite,
+        });
+    }
   }
 
   remove(id: number) {
-    return this.postRepository.update({ id }, { delete_at: new Date() });
+    this.postRepository.update({ id }, { delete_at: new Date() });
   }
 }
