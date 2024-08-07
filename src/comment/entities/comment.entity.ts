@@ -10,7 +10,7 @@ export class CommentEntity {
   @Column({ type: 'varchar' })
   post_id: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   p_id: string;
 
   @Column({ type: 'varchar' })
