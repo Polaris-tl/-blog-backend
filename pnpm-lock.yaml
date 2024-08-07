@@ -32,12 +32,18 @@ dependencies:
   class-validator:
     specifier: ^0.14.1
     version: 0.14.1
+  dotenv:
+    specifier: ^16.4.5
+    version: 16.4.5
   mysql2:
     specifier: ^3.9.2
     version: 3.9.2
   nest-winston:
     specifier: ^1.9.7
     version: 1.9.7(@nestjs/common@10.3.3)(winston@3.13.1)
+  nodemailer:
+    specifier: ^6.9.14
+    version: 6.9.14
   reflect-metadata:
     specifier: ^0.2.0
     version: 0.2.1
@@ -73,6 +79,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.3.1
     version: 20.11.27
+  '@types/nodemailer':
+    specifier: ^6.4.15
+    version: 6.4.15
   '@types/supertest':
     specifier: ^6.0.0
     version: 6.0.2
@@ -1319,6 +1328,12 @@ packages:
     resolution: {integrity: sha512-qyUZfMnCg1KEz57r7pzFtSGt49f6RPkPBis3Vo4PbS7roQEDn22hiHzl/Lo1q4i4hDEgBJmBF/NTNg2XR0HbFg==}
     dependencies:
       undici-types: 5.26.5
+
+  /@types/nodemailer@6.4.15:
+    resolution: {integrity: sha512-0EBJxawVNjPkng1zm2vopRctuWVCxk34JcIlRuXSf54habUWdz1FB7wHDqOqvDa8Mtpt0Q3LTXQkAs2LNyK5jQ==}
+    dependencies:
+      '@types/node': 20.11.27
+    dev: true
 
   /@types/qs@6.9.12:
     resolution: {integrity: sha512-bZcOkJ6uWrL0Qb2NAWKa7TBU+mJHPzhx9jjLL1KHF+XpzEcR7EXHvjbHlGtR/IsP1vyPrehuS6XqkmaePy//mg==}
@@ -4339,6 +4354,11 @@ packages:
   /node-releases@2.0.14:
     resolution: {integrity: sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==}
     dev: true
+
+  /nodemailer@6.9.14:
+    resolution: {integrity: sha512-Dobp/ebDKBvz91sbtRKhcznLThrKxKt97GI2FAlAyy+fk19j73Uz3sBXolVtmcXjaorivqsbbbjDY+Jkt4/bQA==}
+    engines: {node: '>=6.0.0'}
+    dev: false
 
   /normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}

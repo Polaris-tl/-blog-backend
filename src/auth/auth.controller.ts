@@ -18,4 +18,10 @@ export class AuthController {
     console.log(user);
     return this.authService.getUserInfo(user.id);
   }
+
+  @SkipLoginCheck()
+  @Get('sendCode')
+  sendCode(@Body('email') email: string) {
+    return this.authService.sendCode(email);
+  }
 }

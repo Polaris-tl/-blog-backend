@@ -4,6 +4,15 @@ import { FormatterInterceptor } from '@/common/interceptor/formatter';
 import { ValidatePipe } from '@/common/pipe/validate';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
+import { config } from 'dotenv';
+
+if (process.env.NODE_ENV === 'development') {
+  config({ path: ['.env.local', '.env.development'] });
+} else if (process.env.NODE_ENV === 'production') {
+  config({ path: '.env.production' });
+} else {
+  config();
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
