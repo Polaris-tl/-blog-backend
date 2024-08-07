@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginGuard } from '@/common/gurad/login';
+import { WinstonModule } from 'nest-winston';
+import { transports, format } from 'winston';
+import 'winston-daily-rotate-file';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '@/config/configuration';
 import { AuthModule } from './auth/auth.module';
@@ -16,6 +19,51 @@ import { CommentModule } from './comment/comment.module';
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
+    }),
+    WinstonModule.forRoot({
+      level: 'debug',
+      transports: [
+        new transports.Console({
+          format: format.combine(
+            format.colorize(),
+            format.printf(({ context, level, message }) => {
+              const appStr = `[NEST]`;
+              const contextStr = `[${context}]`;
+              return `${appStr} ${level} ${contextStr} ${message} `;
+            }),
+          ),
+        }),
+        new transports.DailyRotateFile({
+          dirname: 'logs',
+          level: 'error',
+          format: format.combine(
+            format.timestamp({
+              format: 'YYYY-MM-DD HH:mm:ss',
+            }),
+            format.json(),
+          ),
+          filename: 'error-%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '30d',
+        }),
+        new transports.DailyRotateFile({
+          dirname: 'logs',
+          level: 'info',
+          format: format.combine(
+            format.timestamp({
+              format: 'YYYY-MM-DD HH:mm:ss',
+            }),
+            format.json(),
+          ),
+          filename: 'info-%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '30d',
+        }),
+      ],
     }),
     JwtModule.registerAsync({
       inject: [ConfigService],

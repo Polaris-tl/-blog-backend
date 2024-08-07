@@ -3,6 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -38,18 +39,21 @@ export interface Response<T> {
 export class FormatterInterceptor<T>
   implements NestInterceptor<T, Response<T>>
 {
+  constructor(private readonly logger: Logger) {}
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data) => {
-        return {
+        const res = {
           code: 200,
           success: true,
           result: transformObjectDeep(data),
           msg: '请求成功',
         };
+        this.logger.log(res);
+        return res;
       }),
     );
   }

@@ -4,11 +4,13 @@ import {
   ArgumentsHost,
   ForbiddenException,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  constructor(private readonly logger: Logger) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -24,6 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       });
     }
     const errorMsg = (exception as Error)?.message;
+    this.logger.error(exception);
     return response.status(500).json({
       code: 500,
       success: false,
