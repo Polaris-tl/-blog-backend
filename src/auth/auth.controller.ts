@@ -24,4 +24,22 @@ export class AuthController {
   sendCode(@Body('email') email: string) {
     return this.authService.sendCode(email);
   }
+
+  @SkipLoginCheck()
+  @Post('signup')
+  signup(
+    @Body('username') username: string,
+    @Body('password') password: string,
+    @Body('email') email: string,
+    @Body('avatar') avatar: string,
+    @Body('verifyCode') verifyCode: string,
+  ) {
+    return this.authService.signup(
+      username,
+      password,
+      email,
+      avatar,
+      verifyCode,
+    );
+  }
 }

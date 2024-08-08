@@ -23,6 +23,6 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter(logger));
   app.useGlobalInterceptors(new FormatterInterceptor(logger));
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

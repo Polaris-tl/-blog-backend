@@ -5,6 +5,7 @@ import { LoginGuard } from '@/common/gurad/login';
 import { WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
 import 'winston-daily-rotate-file';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '@/config/configuration';
 import { AuthModule } from './auth/auth.module';
@@ -18,6 +19,9 @@ import { CommentModule } from './comment/comment.module';
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
+      isGlobal: true,
+    }),
+    CacheModule.register({
       isGlobal: true,
     }),
     WinstonModule.forRoot({

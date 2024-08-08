@@ -33,3 +33,12 @@ export function listToTree<T extends Record<string, any> = any>(
   });
   return result;
 }
+
+export function generateRandomCode(length = 6) {
+  let code = '';
+  const characters = '0123456789';
+  for (let i = 0; i < length; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}

@@ -1,7 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Inject,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/user/user.service';
 import { MailService } from '@/mail/mail.service';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -9,6 +15,7 @@ export class AuthService {
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async login(username: string, password: string) {
@@ -38,7 +45,12 @@ export class AuthService {
   }
 
   async sendCode(email: string) {
-    return this.mailService.sendVerificationCode(email);
+    const _code = await this.cacheManager.get(email);
+    if (_code) {
+      throw new BadRequestException('验证码已发送, 请稍后再试（有效期·5分钟）');
+    }
+    const verifyCode = await this.mailService.sendVerificationCode(email);
+    await this.cacheManager.set(email, verifyCode, 5 * 60 * 1000);
   }
 
   async signup(
@@ -48,21 +60,22 @@ export class AuthService {
     avatar: string,
     verifyCode: string,
   ) {
-    console.log(username, password, verifyCode);
-    // 从redis中获取验证码
-    // const code = await redis.get(email);
-    // if (code !== verifyCode) {
-    //   throw '验证码错误';
-    // }
+    const catchVerifyCode = await this.cacheManager.get(email);
+    if (!catchVerifyCode || catchVerifyCode !== verifyCode) {
+      throw new BadRequestException('验证码错误');
+    }
     const user = await this.usersService.findOne(username);
     if (user) {
-      throw '用户已存在';
+      throw new BadRequestException('用户已存在');
     }
-    return await this.usersService.create({
+    const res = await this.usersService.create({
       username,
       password,
       email: email || '',
       avatar: avatar || '',
     });
+
+    await this.cacheManager.del(email);
+    return res;
   }
 }

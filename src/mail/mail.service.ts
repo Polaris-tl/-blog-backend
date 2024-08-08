@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { generateRandomCode } from '@/common/util';
 import * as nodemailer from 'nodemailer';
 
 // 自定义邮件服务
@@ -19,15 +20,14 @@ export class MailService {
   }
 
   async sendVerificationCode(email: string) {
-    const message = Math.floor(Math.random() * 100000);
+    const message = generateRandomCode();
     const mailOptions: nodemailer.SendMailOptions = {
       from: `Polaris-blog<${this.configService.get('email.user')}>`,
       to: email,
       subject: '网站注册邮箱验证',
       html: `<b>邮箱验证码: ${message}</b>`,
     };
-    // 验证码存在redis中，5分钟后过期
-    // redis.set(email, message, 'EX', 60 * 5);
     await this.transporter.sendMail(mailOptions);
+    return message;
   }
 }
