@@ -15,6 +15,7 @@ import { TagModule } from './tag/tag.module';
 import { CategoryModule } from './category/category.module';
 import { CommentModule } from './comment/comment.module';
 import { MailService } from './mail/mail.service';
+import { EventGateway } from './events/events.gateway';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { MailService } from './mail/mail.service';
       provide: 'CONFIG_SERVICE',
       useClass: ConfigService,
     },
+    EventGateway,
   ],
 })
 export class AppModule {}
