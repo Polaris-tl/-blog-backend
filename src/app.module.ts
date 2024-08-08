@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 import { TagModule } from './tag/tag.module';
 import { CategoryModule } from './category/category.module';
 import { CommentModule } from './comment/comment.module';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -104,6 +105,14 @@ import { CommentModule } from './comment/comment.module';
     {
       provide: 'APP_GUARD',
       useClass: LoginGuard,
+    },
+    {
+      provide: 'MAIL_SERVICE',
+      useClass: MailService,
+    },
+    {
+      provide: 'CONFIG_SERVICE',
+      useClass: ConfigService,
     },
   ],
 })
