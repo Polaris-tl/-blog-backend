@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 export class CreatePostDto {
   @IsString()
   title: string;
@@ -10,7 +10,11 @@ export class CreatePostDto {
   @IsOptional()
   cover: string;
 
-  @IsString()
+  @IsBoolean()
+  @IsOptional()
+  is_top: boolean;
+
+  @IsBoolean()
   @IsOptional()
   publish: boolean;
 }
