@@ -17,6 +17,7 @@ export default () => ({
     pass: process.env.EMAIL_PASS,
   },
   alert: {
+    enable: process.env.ALERT_ENABLE === '1',
     email: process.env.ALERT_EMAIL,
     timeoutSeconds: parseInt(process.env.ALERT_TIMEOUT_SECONDS, 10),
   },

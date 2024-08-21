@@ -34,13 +34,19 @@ export class MailService {
     return message;
   }
   async sendAlert(message: string, type: '响应慢' | '服务器异常') {
+    const enable = this.configService.get('alert.enable');
+    const email = this.configService.get('alert.email');
+    const user = this.configService.get('email.user');
+    if (!enable || !email || !user) {
+      return;
+    }
     if (new Date().getTime() - this.lastSendTime < this.timeThreshold) {
       this.msgList.push(message);
       return;
     }
     const mailOptions: nodemailer.SendMailOptions = {
-      from: `Polaris-blog<${this.configService.get('email.user')}>`,
-      to: this.configService.get('alert.email'),
+      from: `Polaris-blog<${user}>`,
+      to: email,
       subject: '网站报警-' + type,
       html: `<ul>${this.msgList.map((msg) => `<li>${msg}</li>`).join('')}</ul>`,
     };
