@@ -16,6 +16,17 @@ export class PostEntity {
   @Column({ length: 200, nullable: true })
   cover: string;
 
+  @Column({
+    length: 20,
+    nullable: true,
+    default: '0',
+    comment: '文章状态 1 发布 0 草稿',
+  })
+  status: string;
+
+  @Column({ length: 200, nullable: true, comment: '文章描述' })
+  desc: string;
+
   @Column({ type: 'boolean', nullable: true, default: false })
   is_top: boolean;
 

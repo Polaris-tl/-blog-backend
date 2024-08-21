@@ -6,6 +6,10 @@ export class CreatePostDto {
   @IsString()
   content: string;
 
+  tagIds: number[];
+
+  categoryIds: number[];
+
   @IsString()
   @IsOptional()
   cover: string;
